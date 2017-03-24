@@ -13,9 +13,4 @@ class Page extends React.Component {
   }
 }
 
-export default (
-  <Route path="/test" component={Page}>
-    <IndexRoute component={Home}/>
-    <Redirect from="source" to="target" />
-  </Route>
-);
+export {Home, Page};

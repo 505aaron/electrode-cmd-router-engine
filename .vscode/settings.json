@@ -1,0 +1,7 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "eslint.options": {
+        "configFile": "/Users/acordova05/Projects/electrode-cms-router-engine/node_modules/electrode-archetype-njs-module-dev/config/eslint/.eslintrc-node"
+    },
+    "editor.tabSize": 2
+}
