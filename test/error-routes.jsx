@@ -9,10 +9,6 @@ class Error extends React.Component {
   }
 }
 
-export default (
-  <Route path="/" component={Error} />
-);
-
 class RedirectError extends React.Component {
   render () {
     const error = new Error();
@@ -22,8 +18,13 @@ class RedirectError extends React.Component {
   }
 }
 
-const RedirectRoute = (
-  <Route path="/redirect" component={RedirectError} />
-);
+class ServerError extends React.Component {
+  render () {
+    throw {
+      status: 500
+    };
+  }
+}
 
-export {RedirectRoute};
+
+export {RedirectError, Error};

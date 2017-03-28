@@ -1,6 +1,6 @@
 {
-  "name": "electrode-redux-router-engine",
-  "version": "1.2.7",
+  "name": "electrode-cms-router-engine",
+  "version": "1.0.0",
   "description": "Handle async data for React Server Side Rendering using Redux, Router, and a CMS",
   "main": "lib/index.js",
   "scripts": {
