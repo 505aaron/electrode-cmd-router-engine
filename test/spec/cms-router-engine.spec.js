@@ -93,31 +93,56 @@ describe("cms-router-engine", function () {
       });
     });
 
-    // it("should build a complex tree", () => {
-    //   stubCmsResponseAndEngine({
-    //     name: "div",
-    //     type: "html",
-    //     props: {
-    //       "className": "foo",
-    //       "data-test": "my-test"
-    //     },
-    //     children: [
-    //       {
-    //         name: "Home",
-    //         type: "component",
-    //         props: {
-    //           "checked": false
-    //         }
-    //       }
-    //     ]
-    //   });
+    it("should build a complex tree", () => {
+      stubCmsResponseAndEngine({
+        name: "div",
+        type: "html",
+        props: {
+          "className": "foo",
+          "data-test": "my-test"
+        },
+        children: [
+          {
+            name: "Home",
+            type: "component",
+            props: {
+              "checked": false
+            },
+            children: [
+              {
+                name: "a",
+                type: "html",
+                props: {
+                  "className": "foo"
+                }
+              }
+            ]
+          },
+          {
+            name: "a",
+            type: "html",
+            props: {
+              "className": "foo"
+            },
+            children: [
+              {
+                name: "img",
+                type: "html",
+                props: {
+                  "className": "foo"
+                }
+              }
+            ]
+          }
+        ]
+      });
 
-    //   return engine.render(testReq).then((result) => {
-    //     expect(result.status).to.equal(200);
-    //     expect(result.html).to.equal(
-    //       "<div class=\"foo\" data-test=\"my-test\"><div>Home</div></div>");
-    //   });
-    // });
+      return engine.render(testReq).then((result) => {
+        expect(result.status).to.equal(200);
+        expect(result.html).to.equal(
+          "<div class=\"foo\" data-test=\"my-test\"><div><h1>Home</h1><a class=\"foo\"></a></div><a class=\"foo\"><img class=\"foo\"/></a></div>");
+      });
+    });
   });
 
   it("should bootstrap a redux store if redux option is passed in", () => {

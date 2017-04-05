@@ -3,7 +3,10 @@ import { Route, IndexRoute, Redirect } from "react-router";
 
 class Home extends React.Component {
   render () {
-    return <div>Home</div>;
+    return <div>
+      <h1>Home</h1>
+      {this.props.children}
+    </div>;
   }
 }
 
