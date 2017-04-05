@@ -114,7 +114,13 @@ describe("cms-router-engine", function () {
                 type: "html",
                 props: {
                   "className": "foo"
-                }
+                },
+                children: [
+                  {
+                    name: "Home",
+                    type: "component"
+                  }
+                ]
               }
             ]
           },
@@ -140,7 +146,8 @@ describe("cms-router-engine", function () {
       return engine.render(testReq).then((result) => {
         expect(result.status).to.equal(200);
         expect(result.html).to.equal(
-          "<div class=\"foo\" data-test=\"my-test\"><div><h1>Home</h1><a class=\"foo\"></a></div><a class=\"foo\"><img class=\"foo\"/></a></div>");
+          "<div class=\"foo\" data-test=\"my-test\"><div><h1>Home</h1><a class=\"foo\">" +
+          "<div><h1>Home</h1></div></a></div><a class=\"foo\"><img class=\"foo\"/></a></div>");
       });
     });
   });
