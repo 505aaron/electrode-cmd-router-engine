@@ -106,6 +106,7 @@ describe("cms-router-engine", function () {
             name: "Home",
             type: "component",
             props: {
+              "key": "a",
               "checked": false
             },
             children: [
@@ -113,11 +114,15 @@ describe("cms-router-engine", function () {
                 name: "a",
                 type: "html",
                 props: {
+                  "key": "b",
                   "className": "foo"
                 },
                 children: [
                   {
                     name: "Home",
+                    props: {
+                      "key": "bb"
+                    },
                     type: "component"
                   }
                 ]
@@ -128,21 +133,27 @@ describe("cms-router-engine", function () {
             name: "a",
             type: "html",
             props: {
-              "className": "foo"
+              "className": "foo",
+              "key": "c"
             },
             children: [
               {
                 name: "img",
                 type: "html",
                 props: {
+                  "key": "d",
                   "className": "foo"
-                }
+                },
+                children: []
               }
             ]
           },
           {
             name: "p",
             type: "html",
+            props: {
+              "key": "e"
+            },
             children: [
               "I am set"
             ]
