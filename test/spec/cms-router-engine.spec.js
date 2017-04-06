@@ -139,6 +139,13 @@ describe("cms-router-engine", function () {
                 }
               }
             ]
+          },
+          {
+            name: "p",
+            type: "html",
+            children: [
+              "I am set"
+            ]
           }
         ]
       });
@@ -147,7 +154,7 @@ describe("cms-router-engine", function () {
         expect(result.status).to.equal(200);
         expect(result.html).to.equal(
           "<div class=\"foo\" data-test=\"my-test\"><div><h1>Home</h1><a class=\"foo\">" +
-          "<div><h1>Home</h1></div></a></div><a class=\"foo\"><img class=\"foo\"/></a></div>");
+          "<div><h1>Home</h1></div></a></div><a class=\"foo\"><img class=\"foo\"/></a><p>I am set</p></div>");
       });
     });
   });
