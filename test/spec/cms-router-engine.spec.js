@@ -10,7 +10,6 @@ const sinon = require("sinon");
 require("babel-register");
 
 const Home = require("../routes.jsx").Home;
-const Page = require("../routes.jsx").Page;
 const RedirectError = require("../error-routes").RedirectError;
 const Error = require("../error-routes").Error;
 const ServerError = require("../error-routes").ServerError;
@@ -23,7 +22,7 @@ const createReduxStore = () => Promise.resolve(createStore((state) => state, ["U
 describe("cms-router-engine", function () {
   let testReq;
   let cmsClient;
-  let componentMap;
+  let rootComponent;
   let engine;
 
   beforeEach(() => {
@@ -37,13 +36,7 @@ describe("cms-router-engine", function () {
       url: {}
     };
 
-    componentMap = {
-      Home,
-      Page,
-      RedirectError,
-      Error,
-      ServerError
-    };
+    rootComponent = Home;
   });
 
   function stubCmsResponse(componentTree) {
@@ -54,10 +47,10 @@ describe("cms-router-engine", function () {
     }));
   }
 
-  function stubCmsResponseAndEngine(componentTree) {
+  function stubCmsResponseAndEngine(componentTree, root) {
     stubCmsResponse(componentTree);
 
-    engine = new CmsRouterEngine({cmsClient, createReduxStore, componentMap});
+    engine = new CmsRouterEngine({cmsClient, createReduxStore, rootComponent: root || rootComponent});
     testReq.url.path = "/test";
   }
 
@@ -93,79 +86,13 @@ describe("cms-router-engine", function () {
       });
     });
 
-    it("should build a complex tree", () => {
-      stubCmsResponseAndEngine({
-        name: "div",
-        type: "html",
-        props: {
-          "className": "foo",
-          "data-test": "my-test"
-        },
-        children: [
-          {
-            name: "Home",
-            type: "component",
-            props: {
-              "key": "a",
-              "checked": false
-            },
-            children: [
-              {
-                name: "a",
-                type: "html",
-                props: {
-                  "key": "b",
-                  "className": "foo"
-                },
-                children: [
-                  {
-                    name: "Home",
-                    props: {
-                      "key": "bb"
-                    },
-                    type: "component"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            name: "a",
-            type: "html",
-            props: {
-              "className": "foo",
-              "key": "c"
-            },
-            children: [
-              {
-                name: "img",
-                type: "html",
-                props: {
-                  "key": "d",
-                  "className": "foo"
-                },
-                children: []
-              }
-            ]
-          },
-          {
-            name: "p",
-            type: "html",
-            props: {
-              "key": "e"
-            },
-            children: [
-              "I am set"
-            ]
-          }
-        ]
-      });
+    it("should render the root component", () => {
+      stubCmsResponseAndEngine({});
 
       return engine.render(testReq).then((result) => {
         expect(result.status).to.equal(200);
         expect(result.html).to.equal(
-          "<div class=\"foo\" data-test=\"my-test\"><div><h1>Home</h1><a class=\"foo\">" +
-          "<div><h1>Home</h1></div></a></div><a class=\"foo\"><img class=\"foo\"/></a><p>I am set</p></div>");
+          "<div><h1>Home</h1></div>");
       });
     });
   });
@@ -180,7 +107,7 @@ describe("cms-router-engine", function () {
       }
     });
 
-    engine = new CmsRouterEngine({cmsClient, createReduxStore, componentMap });
+    engine = new CmsRouterEngine({cmsClient, createReduxStore, rootComponent });
     testReq.url.path = "/test";
 
     return engine.render(testReq).then((result) => {
@@ -196,7 +123,7 @@ describe("cms-router-engine", function () {
       }
     }));
 
-    engine = new CmsRouterEngine({cmsClient, createReduxStore, componentMap });
+    engine = new CmsRouterEngine({cmsClient, createReduxStore, rootComponent });
     testReq.url.path = "/test";
 
     return engine.render(testReq).then((result) => {
@@ -212,7 +139,7 @@ describe("cms-router-engine", function () {
       path: "/test"
     }));
 
-    engine = new CmsRouterEngine({cmsClient, createReduxStore, componentMap});
+    engine = new CmsRouterEngine({cmsClient, createReduxStore, rootComponent});
     testReq.url.path = "/test";
 
     return engine.render(testReq).then((result) => {
@@ -224,9 +151,9 @@ describe("cms-router-engine", function () {
 
   it("should return 404 if component throws 404", () => {
     stubCmsResponseAndEngine({
-      name: "Error",
+      name: "Home",
       type: "component"
-    });
+    }, Error);
 
     return engine.render(testReq).then((result) => {
       expect(result.status).to.equal(404);
@@ -235,10 +162,7 @@ describe("cms-router-engine", function () {
   });
 
   it("should return 302 and redirect path if component throws related error", () => {
-    stubCmsResponseAndEngine({
-      name: "RedirectError",
-      type: "component"
-    });
+    stubCmsResponseAndEngine({}, RedirectError);
 
     return engine.render(testReq).then((result) => {
       expect(result.status).to.equal(302);
@@ -253,7 +177,7 @@ describe("cms-router-engine", function () {
       type: "html"
     });
 
-    engine = new CmsRouterEngine({cmsClient, componentMap, createReduxStore, withIds: true});
+    engine = new CmsRouterEngine({cmsClient, rootComponent, createReduxStore, withIds: true});
     testReq.url.path = "/test";
 
     return engine.render(testReq).then((result) => {
@@ -281,7 +205,7 @@ describe("cms-router-engine", function () {
 
     engine = new CmsRouterEngine({
       cmsClient,
-      componentMap,
+      rootComponent,
       createReduxStore,
       stringifyPreloadedState: () => `window.__TEST_STATE__`,
       renderToString: () => "test"
@@ -296,17 +220,13 @@ describe("cms-router-engine", function () {
         const newClient = {
           matchRoute: sinon.stub().returns(Promise.resolve({
             renderProps: {
-              componentTree: {
-                name: "ServerError",
-                type: "component"
-              }
             }
           }))
         };
 
         return new CmsRouterEngine({
           cmsClient: newClient,
-          componentMap,
+          rootComponent: ServerError,
           createReduxStore,
           logError: (req, err) => {
             error = err;
@@ -328,7 +248,7 @@ describe("cms-router-engine", function () {
       }
     });
 
-    engine = new CmsRouterEngine({cmsClient, componentMap, createReduxStore, withIds: true});
+    engine = new CmsRouterEngine({cmsClient, rootComponent, createReduxStore, withIds: true});
     testReq.url.path = "/test";
 
     return engine.render(testReq, {withIds: false}).then((result) => {

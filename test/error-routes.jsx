@@ -27,4 +27,4 @@ class ServerError extends React.Component {
 }
 
 
-export {RedirectError, Error};
+export {RedirectError, Error, ServerError};
